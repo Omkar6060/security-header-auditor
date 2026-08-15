@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Security Audit — https://github.com</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #131826;
+    --surface-2: #0F1420;
+    --border: #232B3D;
+    --text: #E6E9EF;
+    --muted: #8891A3;
+    --accent: #FF8A3D;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(255,138,61,0.06), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(143,209,255,0.05), transparent 40%);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .window {
+    width: 100%;
+    max-width: 760px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #F87171; }
+  .dot.y { background: #FBBF24; }
+  .dot.g { background: #4ADE80; }
+  .titlebar .path {
+    margin-left: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .content { padding: 32px; }
+
+  .cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .cmd .prompt { color: var(--accent); }
+  .cmd .cursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--accent);
+    margin-left: 4px;
+    animation: blink 1.1s steps(1) infinite;
+    vertical-align: -2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 6px 0 2px;
+    word-break: break-all;
+  }
+  .subline { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+  .grade-panel {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+  .grade-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    color: #4ADE80;
+    border: 2px solid #4ADE8055;
+    background: #4ADE8014;
+    border-radius: 8px;
+    padding: 10px 18px;
+  }
+  .grade-meta .score { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--muted); }
+  .grade-meta .score b { color: var(--text); }
+
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  section { margin-bottom: 32px; }
+
+  .row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .row:last-child { border-bottom: none; }
+  .row-top { display: flex; align-items: center; gap: 10px; }
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+  .header-name { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; font-weight: 500; }
+  .row-detail { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin: 6px 0 4px 0; word-break: break-all; }
+  .row-detail .value { color: var(--muted); }
+  .row-detail .fix { color: #FBBF24; }
+  .row-desc { font-size: 12.5px; color: var(--muted); }
+
+  .kv {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .kv span:first-child { color: var(--muted); }
+  .kv:last-of-type { border-bottom: none; }
+  .note { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #FBBF24; margin-top: 8px; }
+  .note.fail { color: #F87171; }
+
+  footer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="path">security-audit &mdash; https://github.com</span>
+    </div>
+    <div class="content">
+      <div class="cmd"><span class="prompt">$</span> audit https://github.com<span class="cursor"></span></div>
+      <h1>https://github.com</h1>
+      <div class="subline">Generated 2026-08-15 11:49 UTC &middot; HTTP status 200</div>
+
+      <div class="grade-panel">
+        <div class="grade-badge">A+</div>
+        <div class="grade-meta">
+          <div class="score"><b>90</b> / 100</div>
+          <div class="score">6/7 security headers present</div>
+        </div>
+      </div>
+
+      <section>
+        <h2>HTTP Security Headers</h2>
+        
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">Strict-Transport-Security</span>
+      </div>
+      <div class="row-detail"><span class="value">max-age=31536000; includeSubdomains; preload</span></div>
+      <div class="row-desc">Forces browsers to use HTTPS for future requests (HSTS).</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">Content-Security-Policy</span>
+      </div>
+      <div class="row-detail"><span class="value">default-src &#x27;none&#x27;; base-uri &#x27;self&#x27;; child-src github.githubassets.com github.com/assets-cdn/worker/ github.com/assets/ </span></div>
+      <div class="row-desc">Restricts what sources scripts/styles/frames can load from, mitigating XSS.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">X-Frame-Options</span>
+      </div>
+      <div class="row-detail"><span class="value">deny</span></div>
+      <div class="row-desc">Prevents the page from being embedded in an iframe (clickjacking protection).</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">X-Content-Type-Options</span>
+      </div>
+      <div class="row-detail"><span class="value">nosniff</span></div>
+      <div class="row-desc">Stops browsers from MIME-sniffing a response away from its declared type.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">Referrer-Policy</span>
+      </div>
+      <div class="row-detail"><span class="value">origin-when-cross-origin, strict-origin-when-cross-origin</span></div>
+      <div class="row-desc">Controls how much referrer information is leaked to other sites.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#F87171; border-color:#F8717133; background:#F8717114;">[MISSING]</span>
+        <span class="header-name">Permissions-Policy</span>
+      </div>
+      <div class="row-detail"><span class="fix">fix &rarr; Add: Permissions-Policy: geolocation=(), camera=(), microphone=()</span></div>
+      <div class="row-desc">Restricts which browser features (camera, geolocation, etc.) the page can use.</div>
+    </div>
+
+    <div class="row">
+      <div class="row-top">
+        <span class="tag" style="color:#4ADE80; border-color:#4ADE8033; background:#4ADE8014;">[PRESENT]</span>
+        <span class="header-name">X-XSS-Protection</span>
+      </div>
+      <div class="row-detail"><span class="value">0</span></div>
+      <div class="row-desc">Legacy XSS filter header (deprecated, but still checked by some scanners).</div>
+    </div>
+      </section>
+
+      <section>
+        <h2>TLS Configuration</h2>
+        
+        <div class="kv"><span>protocol</span><span>TLSv1.3</span></div>
+        <div class="kv"><span>cipher_suite</span><span>TLS_AES_256_GCM_SHA384</span></div>
+        <div class="kv"><span>cert_issuer</span><span>Anthropic</span></div>
+        <div class="kv"><span>cert_expires</span><span>2026-09-06 (21 days)</span></div>
+        <div class="note">! Certificate expires soon (21 days)</div>
+        
+      </section>
+    </div>
+    <footer>generated by <a href="#">security-header-auditor</a> &middot; a lightweight AppSec CLI tool</footer>
+  </div>
+</body>
+</html>
