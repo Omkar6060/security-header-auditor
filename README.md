@@ -7,6 +7,7 @@ Built as a hands-on way to apply OWASP Top 10 concepts (specifically **A05:2021 
 ## Why this exists
 
 Missing security headers are one of the most common — and most overlooked — findings in real web application assessments. This tool automates the first-pass check that a pentester or AppSec engineer runs manually: pull the response headers, check TLS posture, and flag what's missing with a concrete fix.
+<img width="685" height="883" alt="Screenshot 2026-08-15 182416" src="https://github.com/user-attachments/assets/eb91e28a-2739-43c7-81f4-43990f614ae8" />
 
 ## What it checks
 
@@ -81,7 +82,7 @@ See [`sample-report.html`](./sample-report.html) for the HTML report output.
 
 - [ ] Batch mode: audit a list of domains from a file
 - [ ] Compare mode: diff two audits of the same domain over time
-- [ ] Cookie security flag checks (`Secure`, `HttpOnly`, `SameSite`)
+- [ ] Cookie security flag checks (`Secure`, `HttpOnly`, `SameSite`)         
 - [ ] Subresource Integrity (SRI) checks on loaded scripts
 
 ## Disclaimer
